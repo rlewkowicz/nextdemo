@@ -11,7 +11,7 @@ module "eks_cluster" {
 
   vpc_id                = var.vpc_id
   subnet_ids            = var.subnet_ids
-  kubernetes_version    = "1.22"
+  kubernetes_version    = "1.23"
   oidc_provider_enabled = true
 
   enabled_cluster_log_types = []
@@ -28,13 +28,13 @@ module "eks_node_group" {
   stage     = var.stage
   name      = var.name
 
-  instance_types     = ["t3a.small"]
+  instance_types     = ["t3a.large"]
   subnet_ids         = var.subnet_ids
   cluster_name       = module.eks_cluster.eks_cluster_id
   desired_size       = var.size
   min_size           = var.size
   max_size           = var.size
-  kubernetes_version = ["1.22"]
+  kubernetes_version = ["1.23"]
   resources_to_tag   = ["instance", "volume", "network-interface"]
   label_key_case     = "title"
   capacity_type      = "SPOT"
@@ -128,5 +128,31 @@ serviceAccount:
     eks.amazonaws.com/role-arn: ${aws_iam_role.external_dns_controller_role.arn}
 EOF
   ]
+}
+
+resource "helm_release" "redis" {
+  depends_on = [module.eks_node_group]
+
+  name             = "redis"
+  repository       = "https://charts.bitnami.com/bitnami"
+  chart            = "./helm/redis"
+  version          = "17.6.0"
+  namespace        = "redis"
+  create_namespace = true
+  verify = false
+  force_update     = true  
+}
+
+resource "helm_release" "argo-cd" {
+  depends_on = [helm_release.nginx_ingress, helm_release.redis, module.eks_node_group]
+
+  name             = "argo-cd"
+  repository       = "https://charts.bitnami.com/bitnami"
+  chart            = "./helm/argo-cd"
+  version          = "4.4.4"
+  namespace        = "argo-cd"
+  create_namespace = true
+  verify = false
+  force_update     = true
 }
 
