@@ -79,7 +79,7 @@ resource "helm_release" "nginx_ingress" {
   version          = "9.3.26"
   namespace        = "nginx"
   create_namespace = true
-  verify = false
+  verify           = false
 
   set {
     name  = "ingressClassResource.default"
@@ -108,7 +108,7 @@ resource "helm_release" "external_dns_helm" {
   version          = "6.13.1"
   namespace        = "external-dns"
   create_namespace = true
-  verify = false
+  verify           = false
   force_update     = true
 
   set {
@@ -139,8 +139,8 @@ resource "helm_release" "redis" {
   version          = "17.6.0"
   namespace        = "redis"
   create_namespace = true
-  verify = false
-  force_update     = true  
+  verify           = false
+  force_update     = true
 }
 
 resource "helm_release" "argo-cd" {
@@ -152,7 +152,19 @@ resource "helm_release" "argo-cd" {
   version          = "4.4.4"
   namespace        = "argo-cd"
   create_namespace = true
-  verify = false
+  verify           = false
   force_update     = true
 }
 
+resource "helm_release" "crossplane" {
+  depends_on = [module.eks_node_group]
+
+  name             = "crossplane"
+  repository       = "https://charts.crossplane.io/stable"
+  chart            = "./helm/crossplane"
+  version          = "1.11.0"
+  namespace        = "crossplane"
+  create_namespace = true
+  verify           = false
+  force_update     = true
+}

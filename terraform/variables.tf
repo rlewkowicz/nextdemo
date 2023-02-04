@@ -14,18 +14,18 @@ variable "name" {
 }
 
 variable "region" {
-  type    = string
+  type = string
 }
 
 variable "vpc_id" {
-  type    = string
+  type = string
 }
 
 variable "subnet_ids" {
-  type    = list(string)
+  type = list(string)
 }
 
 variable "size" {
-  type    = number
+  type = number
 }
 

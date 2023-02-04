@@ -60,3 +60,54 @@ resource "aws_iam_role_policy_attachment" "external_dns_policy_external_dns_cont
   depends_on = [aws_iam_role.external_dns_controller_role]
 }
 
+resource "aws_iam_policy" "crossplane" {
+  name        = "${module.eks_cluster.eks_cluster_id}-crossplane"
+  description = "policy to allow crossplane for ${module.eks_cluster.eks_cluster_id}"
+
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "dynamodb:*"
+        ],
+        "Resource" : [
+          "*"
+        ]
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role" "crossplane" {
+  depends_on = [module.eks_cluster.eks_cluster_identity_oidc_issuer_arn]
+  name       = "${module.eks_cluster.eks_cluster_id}-crossplane"
+
+  assume_role_policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Principal" : {
+            "Federated" : "${module.eks_cluster.eks_cluster_identity_oidc_issuer_arn}"
+          },
+          "Action" : "sts:AssumeRoleWithWebIdentity",
+          "Condition" : {
+            "StringEquals" : {
+              "${replace(module.eks_cluster.eks_cluster_identity_oidc_issuer, "https://", "")}:sub" : "system:serviceaccount:crossplane:provider-aws-*",
+              "${replace(module.eks_cluster.eks_cluster_identity_oidc_issuer, "https://", "")}:aud" : "sts.amazonaws.com"
+            }
+          }
+        }
+      ]
+    }
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "crossplane_policy_crosspolicy_role" {
+  policy_arn = aws_iam_policy.crossplane.arn
+  role       = aws_iam_role.crossplane.name
+  depends_on = [aws_iam_role.crossplane]
+}
