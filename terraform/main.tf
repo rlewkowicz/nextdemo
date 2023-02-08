@@ -168,3 +168,27 @@ resource "helm_release" "crossplane" {
   verify           = false
   force_update     = true
 }
+
+data "aws_caller_identity" "current" {}
+
+resource "kubernetes_manifest" "crossplane_controller_config" {
+
+  depends_on = [helm_release.crossplane, module.eks_node_group, aws_iam_role.crossplane]
+
+  manifest = {
+
+    apiVersion = "pkg.crossplane.io/v1alpha1"
+    kind       = "ControllerConfig"
+
+    metadata = {
+      name = "aws-config"
+      annotations = {
+        "eks.amazonaws.com/role-arn" = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.crossplane.name}"
+      }
+    }
+
+    spec = {
+      podSecurityContext = { fsGroup : 2000 }
+    }
+  }
+}

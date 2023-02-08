@@ -96,7 +96,7 @@ resource "aws_iam_role" "crossplane" {
           "Action" : "sts:AssumeRoleWithWebIdentity",
           "Condition" : {
             "StringEquals" : {
-              "${replace(module.eks_cluster.eks_cluster_identity_oidc_issuer, "https://", "")}:sub" : "system:serviceaccount:crossplane:provider-aws-*",
+              "${replace(module.eks_cluster.eks_cluster_identity_oidc_issuer, "https://", "")}:sub" : "system:serviceaccount:crossplane:*",
               "${replace(module.eks_cluster.eks_cluster_identity_oidc_issuer, "https://", "")}:aud" : "sts.amazonaws.com"
             }
           }

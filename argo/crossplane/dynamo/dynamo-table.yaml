@@ -1,0 +1,17 @@
+apiVersion: dynamodb.aws.crossplane.io/v1alpha1
+kind: Table
+metadata:
+  name: test-table
+  namespace: crossplane
+spec:
+  forProvider:
+    region: us-west-2
+    attributeDefinitions:
+      - attributeName: css
+        attributeType: S
+    billingMode: PAY_PER_REQUEST
+    keySchema:
+      - attributeName: css
+        keyType: HASH
+  providerConfigRef:
+    name: provider-aws
