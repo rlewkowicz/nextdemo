@@ -3,6 +3,8 @@ kind: Provider
 metadata:
   name: provider-aws
   namespace: crossplane
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   package: xpkg.upbound.io/crossplane-contrib/provider-aws:v0.36.1
   controllerConfigRef:

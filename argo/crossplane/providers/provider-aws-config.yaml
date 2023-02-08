@@ -3,6 +3,8 @@ kind: ProviderConfig
 metadata:
   name: provider-aws
   namespace: crossplane
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   credentials:
     source: InjectedIdentity

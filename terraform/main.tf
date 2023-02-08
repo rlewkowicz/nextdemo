@@ -171,24 +171,54 @@ resource "helm_release" "crossplane" {
 
 data "aws_caller_identity" "current" {}
 
-resource "kubernetes_manifest" "crossplane_controller_config" {
+resource "null_resource" "manifests" {
+  depends_on = [
+    module.eks_cluster.kubernetes_config_map_id,
+    helm_release.crossplane
+  ]
 
-  depends_on = [helm_release.crossplane, module.eks_node_group, aws_iam_role.crossplane]
+  triggers = {
+    bananna = "${timestamp()}"
+  }
 
-  manifest = {
-
-    apiVersion = "pkg.crossplane.io/v1alpha1"
-    kind       = "ControllerConfig"
-
-    metadata = {
-      name = "aws-config"
-      annotations = {
-        "eks.amazonaws.com/role-arn" = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.crossplane.name}"
-      }
-    }
-
-    spec = {
-      podSecurityContext = { fsGroup : 2000 }
-    }
+  provisioner "local-exec" {
+    command = <<-EOF
+      aws eks update-kubeconfig --region ${var.region} --name ${module.eks_cluster.eks_cluster_id} && \
+cat <<EOD | kubectl apply -f -
+apiVersion: pkg.crossplane.io/v1alpha1
+kind: ControllerConfig
+metadata:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.crossplane.name}
+  name: aws-config
+spec:
+  podSecurityContext:
+    fsGroup: 2000
+EOD
+    EOF
   }
 }
+
+
+# https://github.com/hashicorp/terraform-provider-kubernetes/issues/1391
+# resource "kubernetes_manifest" "crossplane_controller_config" {
+
+#   depends_on = [null_resource.manifests, module.eks_node_group, aws_iam_role.crossplane]
+
+#   manifest = {
+
+#     apiVersion = "pkg.crossplane.io/v1alpha1"
+#     kind       = "ControllerConfig"
+
+#     metadata = {
+#       name = "aws-config"
+#       annotations = {
+#         "eks.amazonaws.com/role-arn" = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.crossplane.name}"
+#       }
+#     }
+
+#     spec = {
+#       podSecurityContext = { fsGroup : 2000 }
+#     }
+#   }
+# }

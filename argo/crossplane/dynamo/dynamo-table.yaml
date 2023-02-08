@@ -3,6 +3,8 @@ kind: Table
 metadata:
   name: test-table
   namespace: crossplane
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   forProvider:
     region: us-west-2
