@@ -52,24 +52,6 @@ module "eks_node_group" {
   }]
 }
 
-
-resource "helm_release" "cert_manager" {
-  depends_on = [module.eks_node_group]
-
-  name             = "cert-manager"
-  repository       = "https://charts.jetstack.io"
-  chart            = "cert-manager"
-  version          = "v1.7.1"
-  namespace        = "cert-manager"
-  create_namespace = true
-
-
-  set {
-    name  = "installCRDs"
-    value = "true"
-  }
-}
-
 resource "helm_release" "nginx_ingress" {
   depends_on = [helm_release.cert_manager, module.eks_node_group]
 
