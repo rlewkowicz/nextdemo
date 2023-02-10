@@ -4,7 +4,7 @@ This repo is a technological microcosm. You have a locally built docker toolchai
 
 The original goal was going to be a more fully fledged micro platform, demonstrating understanding from the nextdoor eng blog, but I lost a ton of time on argo and would say I prefer flux. This may just be because bitnamis version is strange. 
 
-I wanted to demonstrate some understanding of sitevars, sidecars, and css but you can find some of that here:
+I wanted to demonstrate some understanding of sitevars, sidecars, and css (the site it's self uses cloud front and other caching mechanisms) but you can find some of that here:
 https://hireryan.today/2021/08/13/custom-wordpress-theme-development/
 
 There's only 2 requirements. Docker, and a functioning aws cli config. I'm sure you could export access vars as well, but that is an exercise left to the reader.
@@ -33,7 +33,7 @@ docker run -v $(cd ~ && pwd)/.aws:/root/.aws -v $(pwd):/nextdemo -ti \
 -e K8_CLUSTER_SIZE=$K8_CLUSTER_SIZE \
 -e SUBNET_ARRAY="$SUBNET_ARRAY" \
 -e VPC_ID=$VPC_ID \
-hireryan/toolchain sh -c 'terraform init && terraform apply \
+hireryantoday/toolchain sh -c 'terraform init && terraform apply \
 --var region=$REGION \
 --var size=$K8_CLUSTER_SIZE \
 --var subnet_ids="$SUBNET_ARRAY" \
@@ -41,3 +41,19 @@ hireryan/toolchain sh -c 'terraform init && terraform apply \
 ```
 outcome: 
 ![arch](images/arch.jpeg) 
+
+cleanup: 
+Cleanup can be a pain if you mess up the cluster with the way cloud posse handles their auth if I recall. Ideally it should just be:
+```
+docker run -v $(cd ~ && pwd)/.aws:/root/.aws -v $(pwd):/nextdemo -ti \
+-e REGION=$REGION \
+-e K8_CLUSTER_SIZE=$K8_CLUSTER_SIZE \
+-e SUBNET_ARRAY="$SUBNET_ARRAY" \
+-e VPC_ID=$VPC_ID \
+hireryantoday/toolchain sh -c 'terraform destroy \
+--var region=$REGION \
+--var size=$K8_CLUSTER_SIZE \
+--var subnet_ids="$SUBNET_ARRAY" \
+--var vpc_id=$VPC_ID'
+```
+I'm pushing this demo down to the wire, you might have a dangling dynamo table to be removed manually. 
