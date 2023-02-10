@@ -125,7 +125,7 @@ resource "helm_release" "redis" {
   force_update     = true
 }
 
-resource "helm_release" "argo-cd" {
+resource "helm_release" "argocd" {
   depends_on = [helm_release.nginx_ingress, helm_release.redis, module.eks_node_group]
 
   name             = "argo-cd"
@@ -156,7 +156,8 @@ data "aws_caller_identity" "current" {}
 resource "null_resource" "manifests" {
   depends_on = [
     module.eks_cluster.kubernetes_config_map_id,
-    helm_release.crossplane
+    helm_release.crossplane,
+    helm_release.argocd
   ]
 
   triggers = {
