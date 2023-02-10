@@ -9,7 +9,7 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: argo/crossplane/dynamo-table
+    path: argo/crossplane/dynamo
     repoURL: https://github.com/rlewkowicz/nextdemo.git
   syncPolicy:
     automated:
