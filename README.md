@@ -42,6 +42,17 @@ hireryantoday/toolchain sh -c 'terraform init && terraform apply \
 outcome: 
 ![arch](images/arch.jpeg) 
 
+I use some hard coded domains (again, not an example of code quality). You can update your kube config and get access to the argo install as such:
+```
+# Update your kube config
+aws eks update-kubeconfig --region REGION --name CLUSTER_NAME
+# Put the following into your /etc/hosts
+echo `dig +short $(ku get ingress -n argo-cd argo-cd-server | awk '{print $4}' | grep com) | head -1` argocd.secondpage.io
+# From there login to argocd.secondpage.io with
+user: admin
+pass: itsasecret
+```
+
 cleanup: 
 Cleanup can be a pain if you mess up the cluster with the way cloud posse handles their auth if I recall. Ideally it should just be:
 ```
