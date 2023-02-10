@@ -53,7 +53,7 @@ module "eks_node_group" {
 }
 
 resource "helm_release" "nginx_ingress" {
-  depends_on = [helm_release.cert_manager, module.eks_node_group]
+  depends_on = [module.eks_node_group]
 
   name             = "nginx-ingress"
   repository       = "https://charts.bitnami.com/bitnami"

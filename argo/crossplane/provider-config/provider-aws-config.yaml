@@ -1,7 +1,7 @@
 apiVersion: aws.crossplane.io/v1beta1
 kind: ProviderConfig
 metadata:
-  name: provider-aws
+  name: provider-aws-config
   namespace: crossplane
   annotations:
     argocd.argoproj.io/sync-wave: "1"

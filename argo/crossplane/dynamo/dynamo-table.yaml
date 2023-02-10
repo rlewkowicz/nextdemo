@@ -16,4 +16,4 @@ spec:
       - attributeName: css
         keyType: HASH
   providerConfigRef:
-    name: provider-aws
+    name: provider-aws-config

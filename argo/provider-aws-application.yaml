@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: provider-aws
+  namespace: argo-cd
+spec:
+  destination:
+    namespace: crossplane
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: argo/crossplane/provider
+    repoURL: https://github.com/rlewkowicz/nextdemo.git
+  syncPolicy:
+    automated:
+      selfHeal: true

@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dynamo-table-application.yaml
+  namespace: argo-cd
+spec:
+  destination:
+    namespace: crossplane
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: argo/crossplane/dynamo-table
+    repoURL: https://github.com/rlewkowicz/nextdemo.git
+  syncPolicy:
+    automated:
+      selfHeal: true
