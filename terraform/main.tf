@@ -177,6 +177,10 @@ spec:
   podSecurityContext:
     fsGroup: 2000
 EOD
+echo `dig +short $(kubectl get ingress -n argo-cd argo-cd-server | awk '{print $4}' | grep com) | head -1` argocd.secondpage.io >> /etc/hosts && \
+argocd login argocd.secondpage.io --username admin --password itsasecret --insecure
+argocd cluster add $(kubectl config current-context) -y
+argocd app create app-of-apps --repo https://github.com/rlewkowicz/nextdemo.git --path argo --dest-server https://kubernetes.default.svc --dest-namespace crossplane --sync-policy automated --self-heal
     EOF
   }
 }
