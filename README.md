@@ -46,8 +46,8 @@ I use some hard coded domains (again, not an example of code quality). You can u
 ```
 # Update your kube config
 aws eks update-kubeconfig --region REGION --name CLUSTER_NAME
-# Put the following into your /etc/hosts
-echo `dig +short $(ku get ingress -n argo-cd argo-cd-server | awk '{print $4}' | grep com) | head -1` argocd.secondpage.io
+# Put the outcome of the following into your /etc/hosts
+echo `dig +short $(kubectl get ingress -n argo-cd argo-cd-server | awk '{print $4}' | grep com) | head -1` argocd.secondpage.io
 # From there login to argocd.secondpage.io with
 user: admin
 pass: itsasecret
