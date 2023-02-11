@@ -67,4 +67,3 @@ hireryantoday/toolchain sh -c 'terraform destroy \
 --var subnet_ids="$SUBNET_ARRAY" \
 --var vpc_id=$VPC_ID'
 ```
-I'm pushing this demo down to the wire, you might have a dangling dynamo table to be removed manually. 
